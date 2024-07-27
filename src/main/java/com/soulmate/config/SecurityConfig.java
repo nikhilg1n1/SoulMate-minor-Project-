@@ -12,8 +12,11 @@ public class SecurityConfig {
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-            http.authorizeHttpRequests(auth->auth.requestMatchers("/css/**","/image/**","/video/**","/js/**","/**","/save").permitAll()
+            http.authorizeHttpRequests(auth->
+                    auth.requestMatchers("/css/**","/image/**","/video/**","/js/**","/**").permitAll()
                     .anyRequest().authenticated());
+
+            http.formLogin(form->form.loginPage("/form").successForwardUrl("/save"));
 
             return http.build();
         }
