@@ -63,7 +63,7 @@ public class UserController {
         if (isAuthenticate) {
             return "home";
         } else {
-            model.addAttribute("loginError", "email or password is incorrect");
+            model.addAttribute("loginError", "Email or password is incorrect");
             return "form";
         }
     }
