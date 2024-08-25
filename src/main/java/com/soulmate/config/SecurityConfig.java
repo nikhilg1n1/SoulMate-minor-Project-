@@ -31,7 +31,7 @@ public class SecurityConfig {
             http.authorizeHttpRequests(auth ->
                     auth.requestMatchers("/css/**", "/image/**", "/video/**", "/js/**", "/**").permitAll()
                             .anyRequest().authenticated());
-            http.formLogin(form -> form.loginPage("/form").successForwardUrl("/save"));
+            http.formLogin(form -> form.loginPage("/form").successForwardUrl("/login"));
 
             return http.build();
         }

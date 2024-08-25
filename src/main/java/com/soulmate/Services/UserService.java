@@ -1,9 +1,9 @@
 package com.soulmate.Services;
 
 import com.soulmate.Entites.UserInfo;
-import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
 
-@Component
-public interface UserSevice {
+public interface UserService {
 public void createUser(UserInfo userInfo);
+
 }

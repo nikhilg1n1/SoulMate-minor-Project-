@@ -9,11 +9,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import java.util.Optional;
 
 @Service
-public class CustomUserService implements UserDetailsService {
+public class CustomUserService implements UserDetailsService,UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     @Lazy
@@ -23,23 +24,39 @@ public class CustomUserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<UserInfo>user=userRepository.findByUsername(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<UserInfo>user=userRepository.findByEmail(email);
         if(user.isPresent()) {
             var userObj = user.get();
             return User.builder()
-                    .username(userObj.getUsername())
+                    .username(userObj.getEmail())
                     .password(userObj.getPassword())
                     .roles("user","admin")
                     .build();
         }
         else{
-            throw  new UsernameNotFoundException("User not found"+ username);
+            throw  new UsernameNotFoundException("User not found"+ email);
         }
     }
-    public void createUser(UserInfo userInfo){
-        userInfo.setUsername(userInfo.getUsername());
+    @Override
+    public void createUser(UserInfo userInfo ){
+        if(userRepository.findByEmail(userInfo.getEmail()).isPresent()){
+            throw  new UsernameNotFoundException("User already exists");
+
+        }
+        userInfo.setUsername(userInfo.getEmail());
         userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
         userRepository.save(userInfo);
     }
+
+    public boolean loginUser(String email, String password){
+        Optional<UserInfo> userInfo = userRepository.findByEmail(email);
+        if(userInfo.isPresent() && passwordEncoder.matches(password,userInfo.get().getPassword())){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
 }
