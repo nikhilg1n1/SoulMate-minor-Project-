@@ -32,6 +32,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/css/**", "/image/**", "/video/**", "/js/**", "/**").permitAll()
                             .anyRequest().authenticated());
             http.formLogin(form -> form.loginPage("/form").successForwardUrl("/login"));
+            http.logout(form-> form.logoutUrl("/logout").logoutSuccessUrl("/login"));
 
             return http.build();
         }

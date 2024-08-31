@@ -3,10 +3,7 @@ package com.soulmate.Entites;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -15,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name="User")
+@Builder
 public class UserInfo   {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,9 +24,11 @@ public class UserInfo   {
     @NotEmpty(message = "Email is required")
     private String email;
 
-    @NotEmpty(message = "Minimum 6 digit password is required")
-    @Size(min = 6)
+    @NotEmpty(message = "6 digit password is required")
+    @Size(min = 6 ,message = "6 Letters Password is Required")
     private String password;
+
+    private Role role;
 
 
 }

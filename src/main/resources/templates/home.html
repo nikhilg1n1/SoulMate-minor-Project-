@@ -17,8 +17,16 @@
            <div id="nav">
             <img th:src="@{image/logo.png}" alt="">
             <div id="right">
-                <a href="" th:href="@{/form}" ><h3>Login</h3></a>
-                <a href="" th:href="@{/help}" ><h3>Help</h3><i class="ri-question-line"></i></a>
+                <div th:if="${username}==null">
+                    <a href="" th:href="@{/form}" ><h3>Login</h3></a>
+                    <a href="" th:href="@{/help}" ><h3>Help</h3><i class="ri-question-line"></i></a>
+                </div>
+                <div th:if="${username}!=null">
+                    <span><span th:text="${username}"></span></span>
+                    <form th:action="@{logout}" method= post style="display:inline">
+                        <button type="submit">Logout</button>
+                    </form>
+                </div>
             </div>
            </div>
            <div id="image">

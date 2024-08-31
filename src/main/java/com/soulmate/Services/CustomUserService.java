@@ -1,5 +1,6 @@
 package com.soulmate.Services;
 
+import com.soulmate.Entites.Role;
 import com.soulmate.Entites.UserInfo;
 import com.soulmate.Repository.UserRepository;
 import org.springframework.context.annotation.Lazy;
@@ -28,10 +29,9 @@ public class CustomUserService implements UserDetailsService,UserService {
         Optional<UserInfo>user=userRepository.findByEmail(email);
         if(user.isPresent()) {
             var userObj = user.get();
-            return User.builder()
-                    .username(userObj.getEmail())
+            return User.withUsername(userObj.getUsername())
                     .password(userObj.getPassword())
-                    .roles("user","admin")
+                    .roles(userObj.getRole().name())
                     .build();
         }
         else{
@@ -44,7 +44,7 @@ public class CustomUserService implements UserDetailsService,UserService {
             throw  new UsernameNotFoundException("User already exists");
 
         }
-        userInfo.setUsername(userInfo.getEmail());
+        userInfo.setUsername(userInfo.getUsername());
         userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
         userRepository.save(userInfo);
     }
