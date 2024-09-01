@@ -9,8 +9,12 @@
 <body class="flex items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
 <div class="max-w-md p-6 bg-white border border-gray-200 rounded-lg shadow-lg dark:bg-gray-800 dark:border-gray-700">
 
-    <div th:if="${success}" class="text-green-700 text-sm mt-1">
-        <p th:text="${success}">Email verified successfully!</p>
+    <div th:if="${verified}" class="text-green-700 text-sm mt-1">
+        <p th:text="${verified}"></p>
+    </div>
+
+    <div th:if="${error}" class="text-red-700 text-sm mt-1">
+        <p th:text="${error}"></p>
     </div>
 
     <form th:action="@{/login}" th:object="${userInfo}" method="post">

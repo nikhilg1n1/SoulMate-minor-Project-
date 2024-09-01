@@ -29,7 +29,8 @@ public class CustomUserService implements UserDetailsService,UserService {
         Optional<UserInfo>user=userRepository.findByEmail(email);
         if(user.isPresent()) {
             var userObj = user.get();
-            return User.withUsername(userObj.getUsername())
+            return User.withUsername(userObj.getUserfirstname())
+                    .username(userObj.getEmail())
                     .password(userObj.getPassword())
                     .roles(userObj.getRole().name())
                     .build();
@@ -44,9 +45,14 @@ public class CustomUserService implements UserDetailsService,UserService {
             throw  new UsernameNotFoundException("User already exists");
 
         }
-        userInfo.setUsername(userInfo.getUsername());
+        userInfo.setUserfirstname(userInfo.getUserfirstname());
         userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
         userRepository.save(userInfo);
+    }
+
+    @Override
+    public UserInfo findUsername(String username) {
+        return userRepository.findByUserfirstname(username);
     }
 
     public boolean loginUser(String email, String password){

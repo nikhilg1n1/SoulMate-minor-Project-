@@ -5,5 +5,6 @@ import org.springframework.ui.Model;
 
 public interface UserService {
 public void createUser(UserInfo userInfo);
+public UserInfo findUsername(String username);
 
 }

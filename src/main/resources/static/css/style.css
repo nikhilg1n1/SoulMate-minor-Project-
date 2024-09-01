@@ -50,7 +50,7 @@ html,body{
     display:flex;
     justify-content: space-between;
     align-items: center;
-    width: 200px;
+    /*width: 200px;*/
     margin-right:50px;
     position: relative;
     gap: 20px;
@@ -67,15 +67,15 @@ html,body{
     color:#000;
     display: flex;
     align-items: center;
-    /*gap: 10px;*/
+    gap: 10px;
 }
 #nav #right a:last-child {
     margin-right: 0;
 }
 
-#nav #right a h3 {
-    margin: 0 5px 0 0;
-}
+/*#nav #right a h3 {*/
+/*    margin: 0 5px 0 0;*/
+/*}*/
 #right i{
     font-size: 18px;
     color: #95857F;

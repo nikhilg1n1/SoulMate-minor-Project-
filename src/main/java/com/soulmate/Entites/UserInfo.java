@@ -18,7 +18,9 @@ public class UserInfo   {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotEmpty(message = "Username is required")
-    private String username;
+    private String userfirstname;
+
+    private String userlastname;
 
     @Email
     @NotEmpty(message = "Email is required")

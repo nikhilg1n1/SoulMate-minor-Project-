@@ -41,13 +41,35 @@ public class UserController {
         this.session = session;
     }
     @GetMapping("/")
-    public String homepage(){
+    public String homepage(Model model,Authentication authentication,UserInfo userInfo){
+        if(authentication!=null &&  authentication.isAuthenticated()){
+            UserDetails userDetails=(UserDetails) authentication.getPrincipal();
+            String username=userDetails.getUsername();
+            String firstname=userInfo.getUserfirstname();
+            model.addAttribute("firstname",firstname);
+            return "home";
+        }
         return "home";
     }
+
+    @GetMapping("/profile")
+    public String profilePage(Model model,Authentication authentication){
+        if(authentication!=null &&  authentication.isAuthenticated()){
+            UserDetails userDetails=(UserDetails) authentication.getPrincipal();
+            String username =userDetails.getUsername();
+            model.addAttribute("username",username);
+        }
+        return "profile";
+    }
     @GetMapping("/form")
-    public String loginpage(Model model){
+    public String loginpage(Model model,RedirectAttributes redirectAttributes){
         model.addAttribute("userInfo", new UserInfo());
-        model.addAttribute("success","Email is Successfully Verified");
+//
+//        return "form";
+        model.addAttribute("verified", model.asMap().get("verified"));
+
+        model.addAttribute("error", model.asMap().get("error"));
+        model.addAttribute("success", model.asMap().get("success"));
         return "form";
     }
 
@@ -82,7 +104,6 @@ public class UserController {
             return "register";
         }
         try{
-            userService.createUser(userInfo);
             String otp=emailService.generateOtp();
             System.out.println(STR."generated otp" +otp);
             System.out.println(generatedOtp);
@@ -96,25 +117,25 @@ public class UserController {
         }
     }
     @PostMapping("/login")
-    public String loginUSer(@ModelAttribute UserInfo userInfo , Model model, BindingResult result) {
+    public String loginUSer(@ModelAttribute UserInfo userInfo , Model model, BindingResult result, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             return "form";
         }
         boolean isAuthenticate = customUserService.loginUser(userInfo.getEmail(), userInfo.getPassword());
         if (isAuthenticate) {
-            Authentication authentication = SecurityContextHolder .getContext().getAuthentication();
-            UserDetails userDetails=(UserDetails) authentication.getPrincipal();
-            String username= userDetails.getUsername();
+//            Authentication authentication = SecurityContextHolder .getContext().getAuthentication();
+//            UserDetails userDetails=(UserDetails) authentication.getPrincipal();
+//            String username= userDetails.getUsername();
 
-            model.addAttribute("username",username);
-
+//            model.addAttribute("username",username);
             return "home";
-        } else {
+        }
+        else {
             model.addAttribute("loginError", "Email or password is incorrect");
             return "form";
         }
-    }
 
+    }
 //      @PostMapping("/register")
 //        public  String registerUser(@RequestParam("email"),String email,Model model){
 //            generatedOtp= emailService.sendOtp(email);
@@ -134,24 +155,33 @@ public class UserController {
 
 
             if(userInfo==null){
-                model.addAttribute("error","The Session has been expired please try again letter");
+                redirectAttributes.addFlashAttribute("sessionerror","The Session has been expired please try again letter");
                 System.out.println("Session Expired Redirecting to register page");
-                return "register";
+                return "redirect:/register";
             }
             if(otp.equals(sessionOtp)){
-                model.addAttribute("success","Email verified SuccessFully");
                 System.out.println("Otp Matches redirecting form page");
                 session.removeAttribute("otp");
                 session.removeAttribute("userInfo");
-                redirectAttributes.addFlashAttribute("verified","Email Verified Successfully ");
+                userService.createUser(userInfo);
 
-
+                redirectAttributes.addFlashAttribute("verified","Email Verified Successfully");
+                redirectAttributes.addFlashAttribute("userInfo",new UserInfo());
                 return "redirect:/form";
             }
-            else{
-                model.addAttribute("error ","Invalid otp, please try again");
+            else if(!otp.equals((sessionOtp))){
+                redirectAttributes.addFlashAttribute("error","Invalid otp, please try again");
                 System.out.println("Invalid otp Redirecting to Otp Verification page ");
-                return "otpVerification";
+                return "redirect:/otppage";
+            }
+
+            if (!otp.equals(sessionOtp)) {
+                redirectAttributes.addFlashAttribute("success", "Registration complete");
+                return "redirect:/form";
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Invalid otp");
+                return "redirect:/otppage";
+
             }
         }
 }
