@@ -5,22 +5,29 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
+import java.util.List;
+
 @Entity
+@Getter
+@Setter
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name="User")
 @Builder
-public class UserInfo   {
+public class UserInfo implements UserDetails  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotEmpty(message = "Username is required")
-    private String userfirstname;
+    private String firstname;
 
-    private String userlastname;
+    private String  lastname;
 
     @Email
     @NotEmpty(message = "Email is required")
@@ -32,5 +39,13 @@ public class UserInfo   {
 
     private Role role;
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of( new SimpleGrantedAuthority(role.name()));
+    }
 
+    @Override
+    public String getUsername() {
+        return null;
+    }
 }

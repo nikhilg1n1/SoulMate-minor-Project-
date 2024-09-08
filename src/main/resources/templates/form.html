@@ -19,7 +19,7 @@
 
     <form th:action="@{/login}" th:object="${userInfo}" method="post">
         <h2 class="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Login</h2>
-        <div th:if="${loginError}" class="mb-4 text-red-600 dark:text-red-400">
+        <div th:if="${userInfo}" class="mb-4 text-red-600 dark:text-red-400">
             <p th:text="${loginError}"></p>
         </div>
 

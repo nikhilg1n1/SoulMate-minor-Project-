@@ -2,13 +2,17 @@ package com.soulmate.Controller;
 
 import com.soulmate.Entites.UserInfo;
 import com.soulmate.Exceptions.UserAlreadyExistsException;
+import com.soulmate.Repository.UserRepository;
 import com.soulmate.Services.CustomUserService;
 import com.soulmate.Services.EmailService;
 import com.soulmate.Services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -28,44 +32,72 @@ import java.util.Optional;
 public class UserController {
 
    private  final UserService userService;
+
    private final CustomUserService customUserService;
    private  String generatedOtp;
 
    private final EmailService emailService;
 
    private final HttpSession session;
-    public UserController(UserService userService, CustomUserService customUserService, EmailService emailService, HttpSession session) {
+   private final UserRepository userRepository;
+    public UserController(UserService userService, CustomUserService customUserService, EmailService emailService, HttpSession session, UserRepository userRepository) {
         this.userService = userService;
         this.customUserService = customUserService;
         this.emailService = emailService;
         this.session = session;
+        this.userRepository = userRepository;
     }
-    @GetMapping("/")
-    public String homepage(Model model,Authentication authentication,UserInfo userInfo){
-        if(authentication!=null &&  authentication.isAuthenticated()){
-            UserDetails userDetails=(UserDetails) authentication.getPrincipal();
-            String username=userDetails.getUsername();
-            String firstname=userInfo.getUserfirstname();
-            model.addAttribute("firstname",firstname);
-            return "home";
+//    @GetMapping("/")
+//    public String homepage(Model model,Authentication authentication){
+//        if(authentication!=null &&  authentication.isAuthenticated()){
+//            System.out.println(authentication.getName());
+//            UserDetails userDetails=(UserDetails) authentication.getPrincipal();
+//            String email =userDetails.getUsername();
+//            System.out.println(STR."username is\{email}");
+//            Optional<UserInfo> user= userRepository.findByEmail(email);
+//            if(user.isPresent()){
+//                UserInfo userInfo=user.get();
+//                model.addAttribute("firstname",userInfo.getFirstname());
+//                model.addAttribute("userInfo",userInfo);
+//            }
+//        }
+//        return "home";
+//    }
+@GetMapping("/")
+public String homepage(Model model, Authentication authentication) {
+    if (authentication != null && authentication.isAuthenticated()) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String firstname = userDetails.getUsername();
+        Optional<UserInfo> user = userService.FindByUsername(firstname);
+        if (user.isPresent()) {
+            UserInfo userInfo = user.get();
+            model.addAttribute("userInfo", userInfo);
         }
-        return "home";
     }
+    return "home";
+}
+
 
     @GetMapping("/profile")
-    public String profilePage(Model model,Authentication authentication){
-        if(authentication!=null &&  authentication.isAuthenticated()){
-            UserDetails userDetails=(UserDetails) authentication.getPrincipal();
-            String username =userDetails.getUsername();
-            model.addAttribute("username",username);
-        }
+    public String profilePage(Model model,UserInfo userInfo,Authentication authentication){
+
+//        Authentication authentication1 = SecurityContextHolder.getContext().getAuthentication();
+//        if(authentication == null || !authentication.isAuthenticated() || !(authentication.getPrincipal() instanceof UserDetails userDetails)){
+//            return "form";
+//        }
         return "profile";
     }
     @GetMapping("/form")
-    public String loginpage(Model model,RedirectAttributes redirectAttributes){
-        model.addAttribute("userInfo", new UserInfo());
+    public String loginpage(Model model, HttpSession session,RedirectAttributes redirectAttributes){
+        UserInfo userInfo = (UserInfo) session.getAttribute("userInfo");
+        if(userInfo!=null){
+            model.addAttribute("userInfo",userInfo);
+        }
+        else {
+            model.addAttribute("userInfo", new UserInfo());
+        }
 //
-//        return "form";
+//       return "form";
         model.addAttribute("verified", model.asMap().get("verified"));
 
         model.addAttribute("error", model.asMap().get("error"));
@@ -98,6 +130,7 @@ public class UserController {
         model.addAttribute("userInfo",userInfo);
         return "otpVerification";
     }
+
     @PostMapping("/save")
     public String registerUser(@Valid @ModelAttribute("userInfo") UserInfo userInfo, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
@@ -117,18 +150,26 @@ public class UserController {
         }
     }
     @PostMapping("/login")
-    public String loginUSer(@ModelAttribute UserInfo userInfo , Model model, BindingResult result, RedirectAttributes redirectAttributes) {
+    public String loginUSer(@ModelAttribute("userInfo") UserInfo userInfo , Model model, BindingResult result, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             return "form";
         }
         boolean isAuthenticate = customUserService.loginUser(userInfo.getEmail(), userInfo.getPassword());
         if (isAuthenticate) {
 //            Authentication authentication = SecurityContextHolder .getContext().getAuthentication();
-//            UserDetails userDetails=(UserDetails) authentication.getPrincipal();
-//            String username= userDetails.getUsername();
+//            UserDetails userDetails=
+            Optional<UserInfo> logedInUser= userRepository.findByEmail(userInfo.getEmail());
 
-//            model.addAttribute("username",username);
-            return "home";
+            if(logedInUser.isPresent()){
+                UserInfo userInfo1= logedInUser.get();
+                session.setAttribute("userInfo",userInfo1);
+                model.addAttribute("userInfo",userInfo1);
+                return "home";
+            }else{
+                System.out.println("User not found in database ");
+                model.addAttribute("loginError","user not found");
+                return "form";
+            }
         }
         else {
             model.addAttribute("loginError", "Email or password is incorrect");
@@ -136,14 +177,29 @@ public class UserController {
         }
 
     }
-//      @PostMapping("/register")
-//        public  String registerUser(@RequestParam("email"),String email,Model model){
-//            generatedOtp= emailService.sendOtp(email);
-//           model.addAttribute("email",email);
-//
-//           return "otpVerfication";
+
+//    @PostMapping("/login")
+//    public String loginUser(@ModelAttribute UserInfo userInfo,
+//                            BindingResult result,Model model,
+//                            RedirectAttributes redirectAttributes,
+//                            HttpServletRequest request) {
+//        if (result.hasErrors()) {
+//            model.addAttribute("loginError","Email or Password is incorrect");
+//            return "redirect:/form";
 //        }
-        @PostMapping("/verifyotp")
+//
+//        UsernamePasswordAuthenticationToken authenticationToken =
+//                new UsernamePasswordAuthenticationToken(userInfo.getEmail(), userInfo.getPassword());
+//
+//        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//        // Redirect to the home page after successful login
+//        return "redirect:/";
+//    }
+
+
+    @PostMapping("/verifyotp")
         public String verifyOtp(@RequestParam("email") String email,@RequestParam("otp") String otp,Model model, RedirectAttributes redirectAttributes ){
         String sessionOtp=(String) session.getAttribute("otp");
         UserInfo userInfo=(UserInfo) session.getAttribute("userInfo");
@@ -154,19 +210,22 @@ public class UserController {
             System.out.println(STR."UserInfo from Session\{userInfo}");
 
 
-            if(userInfo==null){
+            if(userInfo==null && sessionOtp==null){
                 redirectAttributes.addFlashAttribute("sessionerror","The Session has been expired please try again letter");
                 System.out.println("Session Expired Redirecting to register page");
                 return "redirect:/register";
             }
             if(otp.equals(sessionOtp)){
                 System.out.println("Otp Matches redirecting form page");
+                System.out.println(userInfo);
+
                 session.removeAttribute("otp");
                 session.removeAttribute("userInfo");
                 userService.createUser(userInfo);
+                System.out.println(userInfo);
 
                 redirectAttributes.addFlashAttribute("verified","Email Verified Successfully");
-                redirectAttributes.addFlashAttribute("userInfo",new UserInfo());
+                System.out.println(userInfo);
                 return "redirect:/form";
             }
             else if(!otp.equals((sessionOtp))){

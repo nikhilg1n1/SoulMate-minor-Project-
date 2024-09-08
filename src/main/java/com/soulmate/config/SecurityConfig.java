@@ -4,6 +4,7 @@ import com.soulmate.Services.CustomUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,10 +30,11 @@ public class SecurityConfig {
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
             http.authorizeHttpRequests(auth ->
-                    auth.requestMatchers("/css/**", "/image/**", "/video/**", "/js/**", "/**").permitAll()
+                    auth.requestMatchers("/css/**", "/image/**", "/video/**", "/js/**", "/**","/login","/register").permitAll()
+                            .requestMatchers("/profile").authenticated()
                             .anyRequest().authenticated());
             http.formLogin(form -> form.loginPage("/form").successForwardUrl("/login"));
-            http.logout(form-> form.logoutUrl("/logout").logoutSuccessUrl("/login"));
+            http.logout(form-> form.logoutUrl("/logout").logoutSuccessUrl("/"));
 
             return http.build();
         }
@@ -48,5 +50,7 @@ public class SecurityConfig {
         provider.setPasswordEncoder(passwordEncoder());
         return  provider;
     }
+
+
 }
 

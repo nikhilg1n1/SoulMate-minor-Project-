@@ -28,15 +28,16 @@ public class CustomUserService implements UserDetailsService,UserService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<UserInfo>user=userRepository.findByEmail(email);
         if(user.isPresent()) {
-            var userObj = user.get();
-            return User.withUsername(userObj.getUserfirstname())
-                    .username(userObj.getEmail())
-                    .password(userObj.getPassword())
-                    .roles(userObj.getRole().name())
-                    .build();
+//            var userObj = user.get();
+//            return User.withUsername(userObj.getFirstname())
+//                   .username(userObj.getEmail())
+//                    .password(userObj.getPassword())
+//                    .roles(userObj.getRole().name())
+//                    .build();
+            return user.get();
         }
         else{
-            throw  new UsernameNotFoundException("User not found"+ email);
+            throw  new UsernameNotFoundException(STR."User not found\{email}");
         }
     }
     @Override
@@ -45,24 +46,23 @@ public class CustomUserService implements UserDetailsService,UserService {
             throw  new UsernameNotFoundException("User already exists");
 
         }
-        userInfo.setUserfirstname(userInfo.getUserfirstname());
         userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
         userRepository.save(userInfo);
     }
 
     @Override
-    public UserInfo findUsername(String username) {
-        return userRepository.findByUserfirstname(username);
+    public Optional<UserInfo> FindByUsername(String firstname) {
+        return userRepository.findByFirstname(firstname);
+    }
+
+    @Override
+    public Optional<UserInfo> FindByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     public boolean loginUser(String email, String password){
         Optional<UserInfo> userInfo = userRepository.findByEmail(email);
-        if(userInfo.isPresent() && passwordEncoder.matches(password,userInfo.get().getPassword())){
-            return true;
-        }
-        else {
-            return false;
-        }
+        return userInfo.isPresent() && passwordEncoder.matches(password, userInfo.get().getPassword());
     }
 
 }
