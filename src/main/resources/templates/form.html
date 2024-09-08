@@ -13,14 +13,18 @@
         <p th:text="${verified}"></p>
     </div>
 
-    <div th:if="${error}" class="text-red-700 text-sm mt-1">
-        <p th:text="${error}"></p>
+    <div th:if="${formError}" class="text-red-700 text-sm mt-1">
+        <p th:text="${formError}"></p>
+    </div>
+
+    <div th:if="${param.error}" class="text-red-700 text-sm mt-1">
+        email username or password. Please try again.
     </div>
 
     <form th:action="@{/login}" th:object="${userInfo}" method="post">
         <h2 class="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Login</h2>
-        <div th:if="${loginError}" class="mb-4 text-red-600 dark:text-red-400">
-            <p th:text="${loginError}"></p>
+        <div th:if="${userInfo}" class="mb-4 text-red-600 dark:text-red-400">
+            <p th:text="${Invalid}"></p>
         </div>
 
         <div class="mb-4">

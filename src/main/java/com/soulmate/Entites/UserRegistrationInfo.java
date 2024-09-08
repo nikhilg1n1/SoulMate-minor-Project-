@@ -1,26 +1,29 @@
 package com.soulmate.Entites;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Optional;
 
 @Entity
+@Getter
+@Setter
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="User")
+@Table(name="Userdetails")
 @Builder
-public class UserInfo   {
+public class UserRegistrationInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotEmpty(message = "Username is required")
-    private String userfirstname;
+    private String firstname;
 
-    private String userlastname;
+    private String  lastname;
 
     @Email
     @NotEmpty(message = "Email is required")
@@ -29,8 +32,6 @@ public class UserInfo   {
     @NotEmpty(message = "6 digit password is required")
     @Size(min = 6 ,message = "6 Letters Password is Required")
     private String password;
-
-    private Role role;
 
 
 }
