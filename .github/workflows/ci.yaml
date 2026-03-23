@@ -16,4 +16,4 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
       - name: Build with maven
-        run: mvn clean install
+        run: mvn clean install -Dspring.profiles.active=ci
