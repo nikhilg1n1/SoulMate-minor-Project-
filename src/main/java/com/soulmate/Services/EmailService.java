@@ -19,7 +19,7 @@ public class EmailService {
         SimpleMailMessage message =new SimpleMailMessage();
         message.setTo(toEmail);
         message.setSubject("Verification code");
-        message.setText(STR."Dear User,\n\nYour OTP (One-Time Password) for email verification is: \{otp}\n\nPlease enter this code to verify your email address.\n\nIf you did not request this verification, please ignore this email.\n\nBest regards,\nTeam SoulMate");
+        message.setText("Dear User,\n\nYour OTP (One-Time Password) for email verification is :" + otp+ "\n\n  Please enter this code to verify your email address.\n\nIf you did not request this verification, please ignore this email.\n\nBest regards,\nTeam SoulMate");
         javaMailSender.send(message);
 
     }
