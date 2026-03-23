@@ -13,9 +13,6 @@ public interface UserService {
 
     void createUser(UserRegistrationInfo userRegistrationInfo);
 
-    Optional<UserRegistrationInfo>FindByUsername(String firstname);
-
-Optional<UserRegistrationInfo>FindByEmail(String email);
 
 boolean checkEmail(String email);
 

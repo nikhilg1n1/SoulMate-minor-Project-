@@ -43,6 +43,14 @@ public class LoginUserService implements UserDetailsService {
         }
     }
 
+    public boolean loginUser(String email, String password){
+        Optional<UserRegistrationInfo> UserRegistration = userRegistrationRepo.findByEmail(email);
+        if (UserRegistration.isPresent()) {
+            return  passwordEncoder.matches(password, UserRegistration.get().getPassword());
+        }
+        return false;
+    }
+
 
 
 }

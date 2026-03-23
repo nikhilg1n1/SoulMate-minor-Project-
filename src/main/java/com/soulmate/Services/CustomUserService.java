@@ -17,13 +17,9 @@ import java.util.Optional;
 public class CustomUserService implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRegistrationRepo userRegistrationRepo;
-    private final UserRegistrationInfo userRegistrationInfo;
-
-    @Lazy
-    public CustomUserService(PasswordEncoder passwordEncoder, UserRegistrationRepo userRegistrationRepo, UserRegistrationInfo userRegistrationInfo) {
+    public CustomUserService(PasswordEncoder passwordEncoder, UserRegistrationRepo userRegistrationRepo) {
         this.passwordEncoder = passwordEncoder;
         this.userRegistrationRepo = userRegistrationRepo;
-        this.userRegistrationInfo = userRegistrationInfo;
     }
 
     // In your UserRegistrationService or Controller where user data is saved
@@ -42,13 +38,7 @@ public class CustomUserService implements UserService {
     public boolean checkEmail(String email) {
         return userRegistrationRepo.existsByEmail(email);
     }
-    public boolean loginUser(String email, String password){
-        Optional<UserRegistrationInfo> UserRegistration = userRegistrationRepo.findByEmail(email);
-        if (UserRegistration.isPresent()) {
-            return  passwordEncoder.matches(password, UserRegistration.get().getPassword());
-        }
-        return false;
-    }
+
 }
 
 

@@ -20,12 +20,12 @@
 
                 <th:block th:if="${userInfo != null}">
                     <!-- Show profile link and logout -->
-                    <img class="profile-img" th:src="@{/image/profile.png}"  style="border-radius: 100px" alt="Profile Photo">
-
+                    <img th:src="${profilepic != null} ? 'data:image/jpeg;base64,' + ${profilePic} : @{/image/profile.png}"
+                         alt="Profile Picture"
+                         class="rounded-full w-10 h-10" style="border-radius: 100%;">
                     <a href="" th:href="@{/profile}"><h3 th:text="${userInfo.firstname}">Profile</h3></a>
                     <a href="" th:href="@{/help}"><h3>Help</h3><i class="ri-question-line"></i></a>
 
-                    </form>
                 </th:block>
 
                 <th:block th:if="${userInfo == null}">

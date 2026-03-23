@@ -32,8 +32,8 @@ public class UserProfile {
     @NotNull(message = "Date of Birth cannot be null")
     private LocalDate dob;
 
-    @Size(max = 255, message = "Profile Picture path must be less than 255 characters")
-    private String profilePicture;
+    @Lob
+    private byte[] profilePicture;
 
     @Email(message = "Email should be valid")
     @NotNull(message = "Email cannot be null")

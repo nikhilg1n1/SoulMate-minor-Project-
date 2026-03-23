@@ -11,6 +11,6 @@ public interface UserRegistrationRepo extends JpaRepository<UserRegistrationInfo
 
    Optional<UserRegistrationInfo> findByEmail(String email);
     boolean existsByEmail(String email);
-    Optional<UserRegistrationInfo> findByFirstname(String firstname);
+
 
 }
