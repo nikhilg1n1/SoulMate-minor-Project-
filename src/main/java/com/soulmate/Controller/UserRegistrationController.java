@@ -90,7 +90,7 @@ public class UserRegistrationController {
 
     @GetMapping("/home")
     public String homePage(Model model, Authentication authentication ,UserRegistrationInfo userRegistrationInfo) {
-        System.out.println("User email is "+userRegistrationRepo.findByEmail(userRegistrationInfo.getEmail()));
+        System.out.println("User email is " + userRegistrationRepo.findByEmail(userRegistrationInfo.getEmail()));
         if (authentication != null && authentication.isAuthenticated()) {
             System.out.println("Authenticated user: " + authentication.getName());
             UserDetails userDetails= (UserDetails) authentication.getPrincipal();
@@ -117,7 +117,8 @@ public class UserRegistrationController {
     }
 
     @GetMapping("/help")
-    public  String help(){
+    public  String help(Model model){
+        model.addAttribute("userInfo","just checking ");
         return "check";
     }
 
@@ -152,7 +153,7 @@ public class UserRegistrationController {
 
             try {
                 String otp = emailService.generateOtp();
-                System.out.println(STR."generated otp" + otp);
+                System.out.println("generated otp" + otp);
                 System.out.println(generatedOtp);
                 session.setAttribute("otp", otp);
                 session.setAttribute("registrationDto", userRegistrationInfo);
@@ -171,10 +172,10 @@ public class UserRegistrationController {
         String sessionOtp=(String) session.getAttribute("otp");
         UserRegistrationInfo userRegistrationInfo = (UserRegistrationInfo) session.getAttribute("registrationDto");
 
-            System.out.println(STR."Email\{email}");
-            System.out.println(STR."Enterd otp\{otp}");
-            System.out.println(STR."Session otp\{sessionOtp}");
-            System.out.println(STR."UserInfo from Session\{userRegistrationInfo}");
+            System.out.println("Email" +email);
+            System.out.println("Enterd otp" + otp);
+            System.out.println("Session otp" + sessionOtp);
+            System.out.println("UserInfo from Session" + userRegistrationInfo);
 
             if(userRegistrationInfo==null && sessionOtp==null){
                 redirectAttributes.addFlashAttribute("sessionerror","The Session has been expired please try again letter");
